@@ -13,4 +13,5 @@ This MLB team has the longest playoff drought, last appearing in the playoffs in
 Mariners
 
 4
-
+The New York Yankees have the most World Series wins, winning it this many times.
+27
