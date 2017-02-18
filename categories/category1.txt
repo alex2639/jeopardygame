@@ -1,25 +1,25 @@
 Pokemon
 
 1
-This Pokemon is the only Pokemon to evolve only if it is raised to level 64. 
+This Pokemon is the only Pokemon to evolve only if it is raised to level 64. /
 Zweilous
 
 2
-This Pokemon is one of 2 Pokemon (the other being Celesteela) that weigh 999.99kg.
+This Pokemon is one of two Pokemon (the other being Celesteela) that weighs exactly 999.99kg. /
 Cosmoem
 
 3
-If a Pokemon were to have all types (Electric, Normal, Water, ...), this type of move would be super effective against it.
+If a Pokemon were to have all types (Electric, Normal, Water, ...), this type of move would be super effective against it. /
 Rock
 
 4
-This Pokemon is the only Pokemon to evolve only if it levels up to level 30 with the 3DS upside down.
+This Pokemon is the only Pokemon to evolve only if it levels up to level 30 with the 3DS upside down. /
 Inkay
 
 5
-This Pokemon is known as the Bully Pokemon.
+This Pokemon is known as the Bully Pokemon. /
 Sharpedo
 
 6
-Doublade evolves into Aegislash through the use of this stone.
+Doublade evolves into Aegislash through the use of this stone. /
 Dusk 

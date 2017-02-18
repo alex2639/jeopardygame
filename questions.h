@@ -17,12 +17,13 @@
 #define NUM_QUESTIONS 12
 
 // List of 3 categories as array of strings
-static char categories[NUM_CATEGORIES][MAX_LEN];/* = {
-    "programming", 
+/*static char categories[NUM_CATEGORIES][MAX_LEN]; = {
+    "programming",
     "algorithms",
     "databases"
 };*/
 
+char categories[NUM_CATEGORIES][MAX_LEN];
 // Questions struct for each question
 typedef struct {
     char category[MAX_LEN];
@@ -50,5 +51,9 @@ extern bool valid_answer(char *category, int value, char *answer);
 
 // Returns true if the question has already been answered
 extern bool already_answered(char *category, int value);
+
+extern bool all_answered(void);
+
+extern bool valid_question(char* category, int value);
 
 #endif /* QUESTIONS_H_ */

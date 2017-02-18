@@ -9,7 +9,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include "questions.h"
+#include <time.h>
 
+#define MAX_LEN 256
+#define NUM_FILES 4
+#define NUM_QUESTIONS_PER_FILE  6
 
 // Initializes the array of questions for the game
 void initialize_game(void)
@@ -17,12 +21,16 @@ void initialize_game(void)
     // initialize each question struct and assign it to the questions array
     //question questions[NUM_QUESTIONS];
     int r;
-    int *category_num=new int[3];
-    bool *taken_category=new bool[5];
+    srand(time(NULL));
+    int category_num[NUM_CATEGORIES];
+    bool taken_category[NUM_FILES+1];
+    for(int i=0;i<NUM_FILES+1;i++){
+      taken_category[i]=false;
+    }
 
     //initialize categories;
-    for (int i=0;i<3;i++){
-      r=(rand() % 4)+1;
+    for (int i=0;i<NUM_CATEGORIES;i++){
+      r=(rand() % NUM_FILES)+1;
       if(taken_category[r]){
         i--;
       }else{
@@ -31,68 +39,97 @@ void initialize_game(void)
       }
     }
     int index=0;
-    int *questions_num=new int[NUM_QUESTIONS];
+    //int questions_num[NUM_QUESTIONS];
+    char line[MAX_LEN];
 
-    for (int i=0;i<sizeof(category_num);i++){
+    for (int i=0;i<NUM_CATEGORIES;i++){
 
-      bool *taken_question=new bool[7];
-      for (int j=0;j<4;j++){
+      bool taken_question[NUM_QUESTIONS_PER_FILE+1];
+      for(int j=0;j<NUM_QUESTIONS_PER_FILE+1;j++){
+        taken_question[j]=false;
+      }
+      for (int j=0;j<4;j++){//number of questions per category
+        //int k=1;
         r=(rand() % 6)+1;
         if(taken_question[r]){
           j--;
         }else{
-          questions_num[index]=r;
-          string filename=("categories/category%d.txt",category_num[i]);
+          //questions_num[index]=r;
+          int q=r;
+          char *filename=malloc(strlen("categories/category")+2+strlen(".txt"));
+          strcpy(filename,"categories/category");
+          char str[MAX_LEN];
+          sprintf(str,"%d",category_num[i]);
+          strcat(filename,str);
+          strcat(filename,".txt");
           FILE *file=fopen(filename, "r");
+          //char phrase[MAX_LEN];
+          //char ans[MAX_LEN];
+
+          int l=0;
           if(file){
             while(fscanf(file,"%s",line)!=EOF){
-              questions[index].category=line;
-              categories[i]=line;
-              if(strcmp(line,r)==0){
-                r=fscanf(file,"%s",line);
-                questions[index].question=line;
-                r=fscanf(file,"%s",line);
-                questions[index].answer=line;
-                questions[index].answered=false;
-                questions[index].value=(j+1)*200;
+              if(l==0){//get category name
+                strcpy(questions[index].category,line);
+                strcpy(categories[i],line);
+                l++;
+              }else{
+                sprintf(str,"%d",r);
+                if(strcmp(line,str)==0){
+                  r=fscanf(file,"%s",line);
+                  char phrase[MAX_LEN];
+                  strcpy(phrase,"");
+                  while(strcmp(line,"/")!=0){
+                    //append line to a string array/vector
+                    strcat(line," ");
+                    strcat(phrase,line);
+                    r=fscanf(file,"%s",line);
+                  }
+                  strcpy(questions[index].question,phrase);
+                  r=fscanf(file,"%s",line);
+                  strcpy(questions[index].answer,line);
+                  questions[index].answered=false;
+                  questions[index].value=(j+1)*200;
+                  //printf("%d\n", questions[index].value);
+                }
               }
             }
             fclose(file);
           }
           index++;
-          taken_question[r]=true;
+          taken_question[q]=true;
         }
       }
     }
-
 }
 
 // Displays each of the remaining categories and question dollar values that have not been answered
 void display_categories(void)
 {
     // print categories and dollar values for each unanswered question in questions array
-    for (int i=0;i<sizeof(categories);i++){
+    for (int i=0;i<3;i++){
       printf("%s\t", categories[i]);
     }
     printf("\n");
     int index=0;
     for(int i=0;i<4;i++){
+      index=0;
       for(int j=0;j<3;j++){
-        if(!questions[index].answered){
-          printf("$%d\t", questions[index].value);
+        if(!questions[index+i].answered){
+          printf("$%d\t", questions[index+i].value);
         }else{
           printf("\t");
         }
+        index+=4;
       }
       printf("\n");
     }
-
 }
 
 // Displays the question for the category and dollar value
 void display_question(char *category, int value)
 {
-  for(int i=0;i<sizeof(questions);i++){
+  for(int i=0;i<NUM_QUESTIONS;i++){
     if(strcmp(category,questions[i].category)==0 && value==questions[i].value){
       printf("%s\n", questions[i].question);
     }
@@ -103,7 +140,7 @@ void display_question(char *category, int value)
 bool valid_answer(char *category, int value, char *answer)
 {
     // Look into string comparison functions
-    for(int i=0;i<sizeof(questions);i++){
+    for(int i=0;i<NUM_QUESTIONS;i++){
       if(strcmp(category,questions[i].category)==0 && value==questions[i].value){
         if(strcmp(answer,questions[i].answer)==0){
           questions[i].answered=true;
@@ -118,7 +155,7 @@ bool valid_answer(char *category, int value, char *answer)
 bool already_answered(char *category, int value)
 {
     // lookup the question and see if it's already been marked as answered
-    for(int i=0;i<sizeof(questions);i++){
+    for(int i=0;i<NUM_QUESTIONS;i++){
       if(strcmp(category,questions[i].category)==0 && value==questions[i].value){
         if(questions[i].answered){
           return true;
@@ -126,4 +163,22 @@ bool already_answered(char *category, int value)
       }
     }
     return false;
+}
+
+bool all_answered(void){
+  for(int i=0;i<NUM_QUESTIONS;i++){
+    if(!questions[i].answered){
+      return false;
+    }
+  }
+  return true;
+}
+
+bool valid_question(char *category, int value){
+  for(int i=0;i<NUM_QUESTIONS;i++){
+    if((strcmp(questions[i].category,category)==0) && questions[i].value==value){
+      return true;
+    }
+  }
+  return false;
 }

@@ -16,26 +16,25 @@ bool player_exists(player *players, int num_players, char *name)
 {
     for (int i=0; i<4; i++){
         if (strcmp(players[i].name,name)== 0){
-                return true;
+          return true;
         }
-         
-    
     }
-  return false;
-    
+    return false;
+
 }
 
-// Go through the list of players and update the score for the 
+// Go through the list of players and update the score for the
 // player given their name
 void update_score(player *players, int num_players, char *name, int score)
 {
-    int score = 0;
+    //int score1 = 0;
     for (int i=0; i<4; i++){
         if (strcmp(players[i].name,name)==0){
             players[i].score = players[i].score + score;
-            printf("Player name: %s, Player score: %d\n", players[i].name, players[i].score)
+            printf("Player name: %s, Player score: %d\n", players[i].name, players[i].score);
         }
-        
+
     }
-    
+    printf("Hit the ENTER key to continue\n");
+
 }
