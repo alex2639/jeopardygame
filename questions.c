@@ -1,7 +1,7 @@
 /*
  * Tutorial 4 Jeopardy Project for SOFE 3950U / CSCI 3020U: Operating Systems
  *
- * Copyright (C) 2015, <GROUP MEMBERS>
+ * Copyright (C) 2015, Alex, Gayanath
  * All rights reserved.
  *
  */
@@ -19,16 +19,15 @@
 void initialize_game(void)
 {
     // initialize each question struct and assign it to the questions array
-    //question questions[NUM_QUESTIONS];
     int r;
     srand(time(NULL));
     int category_num[NUM_CATEGORIES];
-    bool taken_category[NUM_FILES+1];
+    bool taken_category[NUM_FILES+1];//the 3 categories picked will be unique and random
     for(int i=0;i<NUM_FILES+1;i++){
       taken_category[i]=false;
     }
 
-    //initialize categories;
+    //initialize categories randomly;
     for (int i=0;i<NUM_CATEGORIES;i++){
       r=(rand() % NUM_FILES)+1;
       if(taken_category[r]){
@@ -39,22 +38,19 @@ void initialize_game(void)
       }
     }
     int index=0;
-    //int questions_num[NUM_QUESTIONS];
     char line[MAX_LEN];
 
+    //initialize questions for each category randomly
     for (int i=0;i<NUM_CATEGORIES;i++){
-
       bool taken_question[NUM_QUESTIONS_PER_FILE+1];
       for(int j=0;j<NUM_QUESTIONS_PER_FILE+1;j++){
         taken_question[j]=false;
       }
       for (int j=0;j<4;j++){//number of questions per category
-        //int k=1;
         r=(rand() % 6)+1;
         if(taken_question[r]){
           j--;
         }else{
-          //questions_num[index]=r;
           int q=r;
           char *filename=malloc(strlen("categories/category")+2+strlen(".txt"));
           strcpy(filename,"categories/category");
@@ -63,8 +59,6 @@ void initialize_game(void)
           strcat(filename,str);
           strcat(filename,".txt");
           FILE *file=fopen(filename, "r");
-          //char phrase[MAX_LEN];
-          //char ans[MAX_LEN];
 
           int l=0;
           if(file){
@@ -90,7 +84,6 @@ void initialize_game(void)
                   strcpy(questions[index].answer,line);
                   questions[index].answered=false;
                   questions[index].value=(j+1)*200;
-                  //printf("%d\n", questions[index].value);
                 }
               }
             }
@@ -165,6 +158,7 @@ bool already_answered(char *category, int value)
     return false;
 }
 
+//see if all questions are answered
 bool all_answered(void){
   for(int i=0;i<NUM_QUESTIONS;i++){
     if(!questions[i].answered){
@@ -174,6 +168,7 @@ bool all_answered(void){
   return true;
 }
 
+//see if question and dollar value exists
 bool valid_question(char *category, int value){
   for(int i=0;i<NUM_QUESTIONS;i++){
     if((strcmp(questions[i].category,category)==0) && questions[i].value==value){

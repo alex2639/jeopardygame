@@ -1,7 +1,7 @@
 /*
  * Tutorial 4 Jeopardy Project for SOFE 3950U / CSCI 3020U: Operating Systems
  *
- * Copyright (C) 2015, <GROUP MEMBERS>
+ * Copyright (C) 2015, Alex, Gayanath
  * All rights reserved.
  *
  */
@@ -18,7 +18,6 @@
 #define NUM_PLAYERS 4
 #define TOKENS_COUNT 3
 
-
 void prompt_player_names(player* players, int count);
 
 void line(char* destination, FILE* file);
@@ -27,21 +26,22 @@ void line(char* destination, FILE* file);
 
 // Processes the answer from the user containing what is or who is and tokenizes it to retrieve the answer.
 void tokenize(char *input, char **tokens){
-  printf("Tokenizing...\n");
-
-  int i = 0;
-  char inputcopy[MAX_LEN] = { 0 };
-  char *token;
-  const char s[2] = " ";
-
-  strcpy(inputcopy, s);
-
-  token = strtok(inputcopy, s);
-  while (token != NULL){
-    tokens[i] = token;
-    i++;
-    token = strtok(NULL,s);
+  if(input==NULL){
+    return;
   }
+  char *what = strtok(input, " ");
+  char *is = strtok(NULL,"");
+  if(is==NULL){
+    return;
+  }
+  is=strtok(is," ");
+  char *ans=strtok(NULL,"");
+  if(ans==NULL){
+    return;
+  }
+  tokens[0]=what;
+  tokens[1]=is;
+  tokens[2]=ans;
 
 }
 
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     char givenanswer[BUFFER_LEN] = { 0 };
 
     // Display the game introduction and initialize the questions
-    printf("initialize_game\n");
+    printf("Welcome to Jeopardy!\n", );
     initialize_game();
 
     // Prompt for players names
@@ -89,12 +89,10 @@ int main(int argc, char *argv[])
         line(Namecompare, stdin);
         printf("Name selected\n");
         isanswer = false;
-
         if(player_exists(players,NUM_PLAYERS,Namecompare) == true){
           printf("Player selected\n");
 
           do{
-
             printf("Select a category along with a value: ");
             scanf("%s %d", category, &values);
             if(!valid_question(category,values)){
@@ -110,43 +108,32 @@ int main(int argc, char *argv[])
 
           }while (already_answered(category, values) || !valid_question(category,values));
 
-            while (true){
-              printf("Answer: ");
-              line(givenanswer, stdin);
-              printf("%s\n", givenanswer);
-              //tokenize(givenanswer, tokens);
+            printf("Answer: ");
+            line(givenanswer, stdin);
+            tokenize(givenanswer, tokens);
+            printf("%s %s %s\n", tokens[0],tokens[1],tokens[2]);
+            bool good_answer=true;
 
-              /*if(is_valid_answer(tokens)){
-                break;
-              }else{
-                printf("You have to type in who is or what is");
-              }
-              if(is_valid_answer(givenanswer)){
-                break;
-              }else{
-                printf("You have to type in who is or what is");
-              }
-              */
-              break;
+            if(!is_valid_answer(tokens)){
+              printf("You have to answer in a form of a question\n");
+              good_answer=false;
             }
-            while (true){
-              if(valid_answer(category, values, givenanswer)){
+            if (good_answer){
+              if(valid_answer(category, values, tokens[2])){
                   printf("Correct!\n");
                   update_score(players,NUM_PLAYERS,Namecompare, values);
-                  break;
               }else if (isanswer != 1){
                   printf("Incorrect answer\n");
                   //if player inputs wrong answer, subtract the value from
                   //player score
                   update_score(players,NUM_PLAYERS,Namecompare, -values);
-
-                  //print_answer(category,values);
-                  break;
               }
+            }else{
+              update_score(players,NUM_PLAYERS,Namecompare, -values);
             }
 
         }else{
-          printf("Try again: ");
+          printf("Try again. Hit the ENTER key to try again.\n");
         }
 
         // Display the final results and exit
@@ -154,17 +141,18 @@ int main(int argc, char *argv[])
           break;
         }
     }
-        printf("Game over\n");
-        show_results(players, NUM_PLAYERS);
+    printf("Game over\n");
+    show_results(players, NUM_PLAYERS);
 
     return EXIT_SUCCESS;
 }
 
 bool is_valid_answer(char **tokens){
-  //printf("%s\n", tokens[0]);
-  printf("%d\n", sizeof(tokens));
+  if(tokens[0] == NULL || tokens[1] == NULL || tokens[2] == NULL){
+    return false;
+  }
 
-  return (strcmp(tokens[0],"what") == 0 || strcmp (tokens[0], "who") == 0) && strcmp(tokens[1],"is") == 0;
+  return (strcmp(tokens[0],"what") == 0 || strcmp (tokens[0], "who") == 0 || strcmp(tokens[0],"What") == 0 || strcmp (tokens[0], "Who") == 0) && (strcmp(tokens[1],"is") == 0 || strcmp(tokens[1],"are") == 0);
 }
 
 void prompt_player_names(player* players, int count){
@@ -173,7 +161,6 @@ void prompt_player_names(player* players, int count){
         line(players[i].name, stdin);
         players[i].score = 0;
     }
-
 }
 
 void line(char* destination, FILE* file){
@@ -183,7 +170,6 @@ void line(char* destination, FILE* file){
     int lengthofasnwer = strlen(destination) + 1;
     if (lengthofasnwer < BUFFER_LEN){
 
-      //fgets(buffer, BUFFER_LEN, lengthofasnwer, file);
       fgets(buffer, BUFFER_LEN, file);
 
       int bufferlen = strlen(buffer);
